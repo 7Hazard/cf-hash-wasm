@@ -4,7 +4,7 @@ set -e
 
 mkdir -p dist
 
-npm run eslint
+# npm run eslint
 
 if [[ "$(docker images -q clang:latest 2> /dev/null)" == "" ]]; then
   docker build -f scripts/Dockerfile -t clang:latest .
