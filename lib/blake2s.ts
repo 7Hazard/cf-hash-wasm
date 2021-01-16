@@ -1,6 +1,13 @@
 import { WASMInterface, IWASMInterface, IHasher } from './WASMInterface';
 import Mutex from './mutex';
-import wasmJson from '../wasm/blake2s.wasm.json';
+
+try {
+  // @ts-ignore
+  var wasmModule = blake2s_WASM_MODULE
+} catch {
+  var wasmModule = undefined
+}
+
 import lockedCreate from './lockedCreate';
 import { getUInt8Buffer, IDataType } from './util';
 
@@ -47,7 +54,7 @@ export function blake2s(
   const hashLength = bits / 8;
 
   if (wasmCache === null || wasmCache.hashLength !== hashLength) {
-    return lockedCreate(mutex, wasmJson, hashLength)
+    return lockedCreate(mutex, wasmModule, hashLength)
       .then((wasm) => {
         wasmCache = wasm;
         if (initParam > 512) {
@@ -93,7 +100,7 @@ export function createBLAKE2s(
 
   const outputSize = bits / 8;
 
-  return WASMInterface(wasmJson, outputSize).then((wasm) => {
+  return WASMInterface(wasmModule, outputSize).then((wasm) => {
     if (initParam > 512) {
       wasm.writeMemory(keyBuffer);
     }

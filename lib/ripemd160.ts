@@ -1,6 +1,13 @@
 import { WASMInterface, IWASMInterface, IHasher } from './WASMInterface';
 import Mutex from './mutex';
-import wasmJson from '../wasm/ripemd160.wasm.json';
+
+try {
+  // @ts-ignore
+  var wasmModule = ripemd160_WASM_MODULE
+} catch {
+  var wasmModule = undefined
+}
+
 import lockedCreate from './lockedCreate';
 import { IDataType } from './util';
 
@@ -14,7 +21,7 @@ let wasmCache: IWASMInterface = null;
  */
 export function ripemd160(data: IDataType): Promise<string> {
   if (wasmCache === null) {
-    return lockedCreate(mutex, wasmJson, 20)
+    return lockedCreate(mutex, wasmModule, 20)
       .then((wasm) => {
         wasmCache = wasm;
         return wasmCache.calculate(data);
@@ -33,7 +40,7 @@ export function ripemd160(data: IDataType): Promise<string> {
  * Creates a new RIPEMD-160 hash instance
  */
 export function createRIPEMD160(): Promise<IHasher> {
-  return WASMInterface(wasmJson, 20).then((wasm) => {
+  return WASMInterface(wasmModule, 20).then((wasm) => {
     wasm.init();
     const obj: IHasher = {
       init: () => { wasm.init(); return obj; },

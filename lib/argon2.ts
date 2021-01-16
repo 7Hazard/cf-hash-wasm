@@ -6,7 +6,13 @@ import {
 } from './util';
 import { createBLAKE2b } from './blake2b';
 import { WASMInterface, IHasher } from './WASMInterface';
-import wasmJson from '../wasm/argon2.wasm.json';
+
+try {
+  // @ts-ignore
+  var wasmModule = argon2_WASM_MODULE
+} catch {
+  var wasmModule = undefined
+}
 
 export interface IArgon2Options {
   /**
@@ -120,7 +126,7 @@ async function argon2Internal(options: IArgon2OptionsExtended): Promise<string |
   const { memorySize } = options; // in KB
 
   const [argon2Interface, blake512] = await Promise.all([
-    WASMInterface(wasmJson, 1024),
+    WASMInterface(wasmModule, 1024),
     createBLAKE2b(512),
   ]);
 

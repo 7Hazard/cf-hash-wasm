@@ -1,6 +1,13 @@
 import { WASMInterface, IWASMInterface, IHasher } from './WASMInterface';
 import Mutex from './mutex';
-import wasmJson from '../wasm/whirlpool.wasm.json';
+
+try {
+  // @ts-ignore
+  var wasmModule = whirlpool_WASM_MODULE
+} catch {
+  var wasmModule = undefined
+}
+
 import lockedCreate from './lockedCreate';
 import { IDataType } from './util';
 
@@ -14,7 +21,7 @@ let wasmCache: IWASMInterface = null;
  */
 export function whirlpool(data: IDataType): Promise<string> {
   if (wasmCache === null) {
-    return lockedCreate(mutex, wasmJson, 64)
+    return lockedCreate(mutex, wasmModule, 64)
       .then((wasm) => {
         wasmCache = wasm;
         return wasmCache.calculate(data);
@@ -33,7 +40,7 @@ export function whirlpool(data: IDataType): Promise<string> {
  * Creates a new Whirlpool hash instance
  */
 export function createWhirlpool(): Promise<IHasher> {
-  return WASMInterface(wasmJson, 64).then((wasm) => {
+  return WASMInterface(wasmModule, 64).then((wasm) => {
     wasm.init();
     const obj: IHasher = {
       init: () => { wasm.init(); return obj; },

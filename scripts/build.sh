@@ -3,7 +3,6 @@
 set -e
 
 mkdir -p dist
-mkdir -p wasm
 
 npm run eslint
 
@@ -19,7 +18,7 @@ docker run \
   bash -c /app/scripts/build_clang.sh
 
 # node scripts/optimize
-node scripts/make_json
+# node scripts/make_json
 npx rollup -c
 npx tsc ./lib/index --outDir ./dist --downlevelIteration --emitDeclarationOnly --declaration --resolveJsonModule --allowSyntheticDefaultImports
 

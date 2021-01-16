@@ -1,6 +1,13 @@
 import { WASMInterface, IWASMInterface, IHasher } from './WASMInterface';
 import Mutex from './mutex';
-import wasmJson from '../wasm/sha256.wasm.json';
+
+try {
+  // @ts-ignore
+  var wasmModule = sha256_WASM_MODULE
+} catch {
+  var wasmModule = undefined
+}
+
 import lockedCreate from './lockedCreate';
 import { IDataType } from './util';
 
@@ -14,7 +21,7 @@ let wasmCache: IWASMInterface = null;
  */
 export function sha224(data: IDataType): Promise<string> {
   if (wasmCache === null) {
-    return lockedCreate(mutex, wasmJson, 28)
+    return lockedCreate(mutex, wasmModule, 28)
       .then((wasm) => {
         wasmCache = wasm;
         return wasmCache.calculate(data, 224);
@@ -33,7 +40,7 @@ export function sha224(data: IDataType): Promise<string> {
  * Creates a new SHA-2 (SHA-224) hash instance
  */
 export function createSHA224(): Promise<IHasher> {
-  return WASMInterface(wasmJson, 28).then((wasm) => {
+  return WASMInterface(wasmModule, 28).then((wasm) => {
     wasm.init(224);
     const obj: IHasher = {
       init: () => { wasm.init(224); return obj; },

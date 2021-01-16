@@ -1,6 +1,13 @@
 import { getDigestHex, IDataType } from './util';
 import { WASMInterface } from './WASMInterface';
-import wasmJson from '../wasm/scrypt.wasm.json';
+
+try {
+  // @ts-ignore
+  var wasmModule = scrypt_WASM_MODULE
+} catch {
+  var wasmModule = undefined
+}
+
 import { pbkdf2 } from './pbkdf2';
 import { createSHA256 } from './sha256';
 
@@ -50,7 +57,7 @@ async function scryptInternal(options: ScryptOptions): Promise<string | Uint8Arr
     outputType: 'binary',
   });
 
-  const scryptInterface = await WASMInterface(wasmJson, 0);
+  const scryptInterface = await WASMInterface(wasmModule, 0);
 
   // last block is for storing the temporary vectors
   const VSize = 128 * blockSize * costFactor;

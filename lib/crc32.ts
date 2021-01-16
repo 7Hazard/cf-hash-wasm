@@ -1,6 +1,13 @@
 import { WASMInterface, IWASMInterface, IHasher } from './WASMInterface';
 import Mutex from './mutex';
-import wasmJson from '../wasm/crc32.wasm.json';
+
+try {
+  // @ts-ignore
+  var wasmModule = crc32_WASM_MODULE
+} catch {
+  var wasmModule = undefined
+}
+
 import lockedCreate from './lockedCreate';
 import { IDataType } from './util';
 
@@ -14,7 +21,7 @@ let wasmCache: IWASMInterface = null;
  */
 export function crc32(data: IDataType): Promise<string> {
   if (wasmCache === null) {
-    return lockedCreate(mutex, wasmJson, 4)
+    return lockedCreate(mutex, wasmModule, 4)
       .then((wasm) => {
         wasmCache = wasm;
         return wasmCache.calculate(data);
@@ -33,7 +40,7 @@ export function crc32(data: IDataType): Promise<string> {
  * Creates a new CRC-32 hash instance
  */
 export function createCRC32(): Promise<IHasher> {
-  return WASMInterface(wasmJson, 4).then((wasm) => {
+  return WASMInterface(wasmModule, 4).then((wasm) => {
     wasm.init();
     const obj: IHasher = {
       init: () => { wasm.init(); return obj; },

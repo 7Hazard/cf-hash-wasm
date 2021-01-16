@@ -1,5 +1,5 @@
 {
-  "name": "hash-wasm",
+  "name": "cf-hash-wasm",
   "version": "4.4.1",
   "description": "Lightning fast hash functions for browsers and Node.js using hand-tuned WebAssembly binaries (MD4, MD5, SHA-1, SHA-2, SHA-3, Keccak, BLAKE2, PBKDF2, Argon2, bcrypt, scrypt, CRC32, RIPEMD-160, HMAC, xxHash, SM3, Whirlpool)",
   "main": "dist/index.umd.js",
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Daninet/hash-wasm.git"
+    "url": "git+https://github.com/7hazard/cf-hash-wasm.git"
   },
   "keywords": [
     "hash",
@@ -70,9 +70,9 @@
     "whirlpool"
   ],
   "bugs": {
-    "url": "https://github.com/Daninet/hash-wasm/issues"
+    "url": "https://github.com/7hazard/cf-hash-wasm/issues"
   },
-  "homepage": "https://github.com/Daninet/hash-wasm#readme",
+  "homepage": "https://github.com/7hazard/cf-hash-wasm#readme",
   "author": "Dani Biró <danibiro93@gmail.com> (https://danibiro.com)",
   "license": "MIT",
   "devDependencies": {

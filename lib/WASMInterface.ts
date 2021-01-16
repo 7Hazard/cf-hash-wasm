@@ -39,9 +39,11 @@ export type IHasher = {
   digestSize: number;
 }
 
-const wasmModuleCache = new Map<string, Promise<WebAssembly.Module>>();
-
-export async function WASMInterface(binary: any, hashLength: number) {
+export async function WASMInterface(module: any, hashLength: number) {
+  if(module == undefined)
+  {
+    throw Error("Attempted to load an undefined WASM module")
+  }
   let wasmInstance = null;
   let memoryView: Uint8Array = null;
   let initialized = false;
@@ -65,15 +67,7 @@ export async function WASMInterface(binary: any, hashLength: number) {
   };
 
   const loadWASMPromise = wasmMutex.dispatch(async () => {
-    if (!wasmModuleCache.has(binary.name)) {
-      const asm = decodeBase64(binary.data);
-      const promise = WebAssembly.compile(asm);
-
-      wasmModuleCache.set(binary.name, promise);
-    }
-
-    const module = await wasmModuleCache.get(binary.name);
-    wasmInstance = await WebAssembly.instantiate(module, {
+    wasmInstance = new WebAssembly.Instance(module, {
       // env: {
       //   emscripten_memcpy_big: (dest, src, num) => {
       //     const memoryBuffer = wasmInstance.exports.memory.buffer;
@@ -154,25 +148,25 @@ export async function WASMInterface(binary: any, hashLength: number) {
   let canSimplify:
     (data: IDataType, initParam?: number) => boolean = isDataShort;
 
-  switch (binary.name) {
-    case 'argon2.wasm':
-    case 'scrypt.wasm':
-      canSimplify = () => true;
-      break;
+  // switch (binary.name) {
+  //   case 'argon2.wasm':
+  //   case 'scrypt.wasm':
+  //     canSimplify = () => true;
+  //     break;
 
-    case 'blake2b.wasm':
-    case 'blake2s.wasm':
-      // if there is a key at blake2b then cannot simplify
-      canSimplify = (data, initParam) => initParam <= 512 && isDataShort(data);
-      break;
+  //   case 'blake2b.wasm':
+  //   case 'blake2s.wasm':
+  //     // if there is a key at blake2b then cannot simplify
+  //     canSimplify = (data, initParam) => initParam <= 512 && isDataShort(data);
+  //     break;
 
-    case 'xxhash64.wasm': // cannot simplify
-      canSimplify = () => false;
-      break;
+  //   case 'xxhash64.wasm': // cannot simplify
+  //     canSimplify = () => false;
+  //     break;
 
-    default:
-      break;
-  }
+  //   default:
+  //     break;
+  // }
 
   // shorthand for (init + update + digest) for better performance
   const calculate = (

@@ -1,13 +1,38 @@
-# hash-wasm
+# cf-hash-wasm
 
-[![npm package](https://img.shields.io/npm/v/hash-wasm.svg)](http://npmjs.org/package/hash-wasm)
-[![Bundle size](https://badgen.net/bundlephobia/minzip/hash-wasm)](https://bundlephobia.com/result?p=hash-wasm)
-[![codecov](https://codecov.io/gh/Daninet/hash-wasm/branch/master/graph/badge.svg)](https://codecov.io/gh/Daninet/hash-wasm)
-[![Build status](https://github.com/Daninet/hash-wasm/workflows/Build%20&%20publish/badge.svg?branch=master)](https://github.com/Daninet/hash-wasm/actions)
-[![JSDelivr downloads](https://data.jsdelivr.com/v1/package/npm/hash-wasm/badge)](https://www.jsdelivr.com/package/npm/hash-wasm)
+[![npm package](https://img.shields.io/npm/v/cf-hash-wasm.svg)](http://npmjs.org/package/cf-hash-wasm)
+[![Bundle size](https://badgen.net/bundlephobia/minzip/cf-hash-wasm)](https://bundlephobia.com/result?p=cf-hash-wasm)
+[![codecov](https://codecov.io/gh/7hazard/cf-hash-wasm/branch/master/graph/badge.svg)](https://codecov.io/gh/7hazard/cf-hash-wasm)
+[![Build status](https://github.com/7hazard/cf-hash-wasm/workflows/Build%20&%20publish/badge.svg?branch=master)](https://github.com/7hazard/cf-hash-wasm/actions)
+[![JSDelivr downloads](https://data.jsdelivr.com/v1/package/npm/cf-hash-wasm/badge)](https://www.jsdelivr.com/package/npm/cf-hash-wasm)
 
+Fork of [hash-wasm](https://github.com/Daninet/hash-wasm)  
 Hash-WASM is a ⚡lightning fast⚡ hash function library for browsers and Node.js.
 It is using hand-tuned WebAssembly binaries to calculate the hash faster than other libraries.
+
+## Cloudflare Workers
+
+Adapted for Cloudflare Workers  
+Time achieved on 100 requests (1 subrequest/request) with following setup:
+```js
+const salt = new Uint8Array(16);
+crypto.getRandomValues(salt);
+let paralellism = 2;
+let hash = await argon2id({
+  password: "example",
+  salt: salt,
+  iterations: 4,
+  parallelism: paralellism,
+  hashLength: 16, // 128 bits
+  memorySize: 8 * paralellism, // minimum, 8*2 KiB = 16 KiB
+  outputType: "hex",
+});
+```
+99.9th percentile: 9.2 ms  
+99th percentile: 9.1 ms  
+75th percentile: 7.4 ms  
+50th percentile: 5.9 ms  
+Higher memorySize equates to longer execution times  
 
 Supported algorithms
 =======
@@ -53,8 +78,8 @@ Features
 - Works in Web Workers
 - Zero dependencies
 - Supports concurrent hash calculations with multiple states
-- [Unit tests](https://github.com/Daninet/hash-wasm/tree/master/test) for all algorithms
-- 100% open source & transparent [build process](https://github.com/Daninet/hash-wasm/actions)
+- [Unit tests](https://github.com/7hazard/cf-hash-wasm/tree/master/test) for all algorithms
+- 100% open source & transparent [build process](https://github.com/7hazard/cf-hash-wasm/actions)
 - Easy to use, Promise-based API
 
 

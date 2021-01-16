@@ -1,6 +1,13 @@
 import { WASMInterface, IWASMInterface, IHasher } from './WASMInterface';
 import Mutex from './mutex';
-import wasmJson from '../wasm/sha3.wasm.json';
+
+try {
+  // @ts-ignore
+  var wasmModule = sha3_WASM_MODULE
+} catch {
+  var wasmModule = undefined
+}
+
 import lockedCreate from './lockedCreate';
 import { IDataType } from './util';
 
@@ -31,7 +38,7 @@ export function sha3(
   const hashLength = bits / 8;
 
   if (wasmCache === null || wasmCache.hashLength !== hashLength) {
-    return lockedCreate(mutex, wasmJson, hashLength)
+    return lockedCreate(mutex, wasmModule, hashLength)
       .then((wasm) => {
         wasmCache = wasm;
         return wasmCache.calculate(data, bits, 0x06);
@@ -57,7 +64,7 @@ export function createSHA3(bits: IValidBits = 512): Promise<IHasher> {
 
   const outputSize = bits / 8;
 
-  return WASMInterface(wasmJson, outputSize).then((wasm) => {
+  return WASMInterface(wasmModule, outputSize).then((wasm) => {
     wasm.init(bits);
     const obj: IHasher = {
       init: () => { wasm.init(bits); return obj; },

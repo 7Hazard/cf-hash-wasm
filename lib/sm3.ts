@@ -1,6 +1,13 @@
 import { WASMInterface, IWASMInterface, IHasher } from './WASMInterface';
 import Mutex from './mutex';
-import wasmJson from '../wasm/sm3.wasm.json';
+
+try {
+  // @ts-ignore
+  var wasmModule = sm3_WASM_MODULE
+} catch {
+  var wasmModule = undefined
+}
+
 import lockedCreate from './lockedCreate';
 import { IDataType } from './util';
 
@@ -14,7 +21,7 @@ let wasmCache: IWASMInterface = null;
  */
 export function sm3(data: IDataType): Promise<string> {
   if (wasmCache === null) {
-    return lockedCreate(mutex, wasmJson, 32)
+    return lockedCreate(mutex, wasmModule, 32)
       .then((wasm) => {
         wasmCache = wasm;
         return wasmCache.calculate(data);
@@ -33,7 +40,7 @@ export function sm3(data: IDataType): Promise<string> {
  * Creates a new SM3 hash instance
  */
 export function createSM3(): Promise<IHasher> {
-  return WASMInterface(wasmJson, 32).then((wasm) => {
+  return WASMInterface(wasmModule, 32).then((wasm) => {
     wasm.init();
     const obj: IHasher = {
       init: () => { wasm.init(); return obj; },

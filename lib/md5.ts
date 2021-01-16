@@ -1,6 +1,13 @@
 import { WASMInterface, IWASMInterface, IHasher } from './WASMInterface';
 import Mutex from './mutex';
-import wasmJson from '../wasm/md5.wasm.json';
+
+try {
+  // @ts-ignore
+  var wasmModule = md5_WASM_MODULE
+} catch {
+  var wasmModule = undefined
+}
+
 import lockedCreate from './lockedCreate';
 import { IDataType } from './util';
 
@@ -14,7 +21,7 @@ let wasmCache: IWASMInterface = null;
  */
 export function md5(data: IDataType): Promise<string> {
   if (wasmCache === null) {
-    return lockedCreate(mutex, wasmJson, 16)
+    return lockedCreate(mutex, wasmModule, 16)
       .then((wasm) => {
         wasmCache = wasm;
         return wasmCache.calculate(data);
@@ -33,7 +40,7 @@ export function md5(data: IDataType): Promise<string> {
  * Creates a new MD5 hash instance
  */
 export function createMD5(): Promise<IHasher> {
-  return WASMInterface(wasmJson, 16).then((wasm) => {
+  return WASMInterface(wasmModule, 16).then((wasm) => {
     wasm.init();
     const obj: IHasher = {
       init: () => { wasm.init(); return obj; },

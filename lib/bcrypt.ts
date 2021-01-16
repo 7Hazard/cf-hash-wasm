@@ -2,7 +2,14 @@ import {
   getDigestHex, getUInt8Buffer, IDataType, intArrayToString,
 } from './util';
 import { WASMInterface } from './WASMInterface';
-import wasmJson from '../wasm/bcrypt.wasm.json';
+
+try {
+  // @ts-ignore
+  var wasmModule = bcrypt_WASM_MODULE
+} catch {
+  var wasmModule = undefined
+}
+
 
 export interface BcryptOptions {
   /**
@@ -26,7 +33,7 @@ export interface BcryptOptions {
 async function bcryptInternal(options: BcryptOptions): Promise<string | Uint8Array> {
   const { costFactor, password, salt } = options;
 
-  const bcryptInterface = await WASMInterface(wasmJson, 0);
+  const bcryptInterface = await WASMInterface(wasmModule, 0);
   bcryptInterface.writeMemory(getUInt8Buffer(salt), 0);
   const passwordBuffer = getUInt8Buffer(password);
   bcryptInterface.writeMemory(passwordBuffer, 16);
@@ -161,7 +168,7 @@ export async function bcryptVerify(options: BcryptVerifyOptions): Promise<boolea
 
   const { hash, password } = options;
 
-  const bcryptInterface = await WASMInterface(wasmJson, 0);
+  const bcryptInterface = await WASMInterface(wasmModule, 0);
   bcryptInterface.writeMemory(getUInt8Buffer(hash), 0);
 
   const passwordBuffer = getUInt8Buffer(password);

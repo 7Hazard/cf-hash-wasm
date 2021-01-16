@@ -1,6 +1,13 @@
 import { WASMInterface, IWASMInterface, IHasher } from './WASMInterface';
 import Mutex from './mutex';
-import wasmJson from '../wasm/xxhash64.wasm.json';
+
+try {
+  // @ts-ignore
+  var wasmModule = xxhash64_WASM_MODULE
+} catch {
+  var wasmModule = undefined
+}
+
 import lockedCreate from './lockedCreate';
 import { IDataType } from './util';
 
@@ -43,7 +50,7 @@ export function xxhash64(
   }
 
   if (wasmCache === null) {
-    return lockedCreate(mutex, wasmJson, 8)
+    return lockedCreate(mutex, wasmModule, 8)
       .then((wasm) => {
         wasmCache = wasm;
         writeSeed(seedBuffer, seedLow, seedHigh);
@@ -78,7 +85,7 @@ export function createXXHash64(seedLow = 0, seedHigh = 0): Promise<IHasher> {
     return Promise.reject(validateSeed(seedHigh));
   }
 
-  return WASMInterface(wasmJson, 8).then((wasm) => {
+  return WASMInterface(wasmModule, 8).then((wasm) => {
     const instanceBuffer = new ArrayBuffer(8);
     writeSeed(instanceBuffer, seedLow, seedHigh);
     wasm.writeMemory(new Uint8Array(instanceBuffer));
