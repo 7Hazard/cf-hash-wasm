@@ -16,7 +16,7 @@ docker run \
   -v $(pwd):/app \
   -u $(id -u):$(id -g) \
   clang:latest \
-  bash -c /app/scripts/build_clang.sh
+  bash -c /app/scripts/build_clang.sh /app/
 
 # node scripts/optimize
 # node scripts/make_json
