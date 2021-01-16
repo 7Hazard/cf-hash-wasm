@@ -19,7 +19,7 @@ const TERSER_CONFIG = {
 const LICENSE_CONFIG = {
   banner: {
     commentStyle: 'ignored',
-    content: `hash-wasm (https://www.npmjs.com/package/hash-wasm)
+    content: `cf-hash-wasm (https://www.npmjs.com/package/cf-hash-wasm)
     (c) Dani Biro
     @license MIT`,
   },
