@@ -3,6 +3,7 @@
 set -e
 
 mkdir -p dist
+mkdir -p dist/wasm
 
 # npm run eslint
 

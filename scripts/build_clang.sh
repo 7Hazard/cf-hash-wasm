@@ -1,8 +1,5 @@
 #!/bin/bash
 
-mkdir -p dist
-mkdir -p dist/wasm
-
 set -e
 
 clang --version
